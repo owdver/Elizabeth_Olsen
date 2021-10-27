@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # (c) @AlbertEinsteinTG & @Mrk_YT & @OwDvEr
+import os
+import logging
+
 
 from pyrogram import filters, Client
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
@@ -12,16 +15,56 @@ from bot import MRK_YT_MASTER
 from bot import MT_GROUP
 from bot import MT_CHANNEL # Main Channel Added
 from bot.motech import MT_BOT_UPDATES
+logger = logging.getLogger(__name__)
 
 db = Database()
 
 @Client.on_message(filters.command(["start"]) & filters.private, group=1)
-async def start(bot, update):
-    update_channel = UPDATE_CHANNEL
-    if update_channel:
-        try:
-            user = await bot.get_chat_member(update_channel, update.chat.id)
-            if user.status == "kicked out":
+async def start(bot, update, cmd):
+    usr_cmdall1 = cmd.text
+    if usr_cmdall1.startswith("/start owdver"):
+        if UPDATE_CHANNEL:
+            invite_link = await bot.create_chat_invite_link(int(UPDATE_CHANNEL))
+            try:
+                user = await bot.get_chat_member(int(UPDATE_CHANNEL), cmd.from_user.id)
+                if user.status == "kicked":
+                    await bot.send_message(
+                        chat_id=cmd.from_user.id,
+                        text ="Sorry Sir, Your Banned to use me",
+                        parse_mode="markdown",
+                        desable_webpage_preview=True
+                    )
+                    return
+                exept UserNotParticipant:
+                    ident, file_id = cmd.text.split("_-_-_-_")
+                    await bot.send_message(
+                        chat_id=cmd.from_user.id,
+                        text="**Please Join My Updates Channel to use this Bot!**",
+                        reply_markup=InlineKeyboardMarkup(
+                            [
+                                [
+                                    InlineKeyboardMarkup("🤖 Join Updates Channel", url=invite_link.invite_link)
+                                ]
+                                [
+                                    InlineKeyboardButton(" 🔄 Try Again", callback_data=f"checksub#{file_id}")
+                                ]
+                            ]
+                        ),
+                        parse_mode="markdown"
+                    )
+                    return
+                except Exceptetion:
+                    await bot.send_message(
+                        chat_id=cmd.from_user.id,
+                        text="Something went Wrong",
+                        parse_mode="markdown",
+                        disable_webpage_preview=True
+                    )
+                    return
+                
+                        
+
+                    
                await update.reply_text("𝚂𝚘𝚛𝚛𝚢 𝙳𝚞𝚍𝚎, 𝚈𝚘𝚞 𝚊𝚛𝚎 𝙱𝚊𝚗𝚗𝚎𝚍")
                return
         except UserNotParticipant:
